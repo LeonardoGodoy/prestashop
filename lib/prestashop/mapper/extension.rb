@@ -2,6 +2,10 @@ module Prestashop
   module Mapper
     module Extension
       module ClassMethods
+        def schema client, include_synopsis=false
+          schema_type = include_synopsis ? 'synopsis' : 'blank'
+          client.read self.resource, nil, { schema: schema_type }
+        end
 
         # Determinate if model with class resource exists with given id
         #
