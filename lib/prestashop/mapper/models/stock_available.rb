@@ -18,17 +18,16 @@ module Prestashop
         @out_of_stock         = args.fetch(:out_of_stock, 2)
       end
 
-      def id
+      def find?(client)
         @id ||= if id_product_attribute == 0
-          self.class.find_by 'filter[id_product]' => id_product
+          self.class.find_by client, 'filter[id_product]' => id_product
         else
-          self.class.find_by 'filter[id_product]' => id_product, 'filter[id_product_attribute]' => id_product_attribute
+          self.class.find_by client, 'filter[id_product]' => id_product, 'filter[id_product_attribute]' => id_product_attribute
         end
       end
-      alias :find? :id
 
-      def update options = {}
-        self.class.update(id, options) if find?
+      def update client, options = {}
+        self.class.update(client, id, options) if find?
       end
     end
   end

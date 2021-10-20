@@ -8,8 +8,8 @@ module Prestashop
         #   Car.exists?(1) # => true # if given car exist
         #   Car.exists?(2) # => false # if given car don't exist
         #
-        def exists? id
-          Client.check self.resource, id
+        def exists? client, id
+          client.check self.resource, id
         end
 
         # Find model by class resource and given id, returns hash
@@ -18,8 +18,8 @@ module Prestashop
         #   Car.find(1) # => { id: 1, name: 'BMW' }
         #   Car.find(2) # => nil
         #
-        def find id
-          result = Client.read self.resource, id
+        def find client, id
+          result = client.read self.resource, id
           result ? result[self.model] : nil
         end
 
@@ -28,7 +28,7 @@ module Prestashop
         #
         #   Car.find_by(name: 'BMW') # => 1
         #
-        def find_by options = {}
+        def find_by client, options = {}
           results = where(options)
           results ? results.first : nil
         end
@@ -39,17 +39,17 @@ module Prestashop
         #   Car.all # => [1,2,3]
         #   Car.all(display: ['name']) # => [{ name: { language: { attr: { id: 2, href: 'http://localhost.com/api/languages/2'}, val: 'BMW 7'} }]
         #
-        def all options = {}
-          result = Client.read self.resource, nil, options
+        def all client, options = {}
+          result = client.read self.resource, nil, options
           handle_result result, options
         end
-        
+
         # Get results by class resource and given conditionals
         #
         #   Car.where('filter[id_supplier' => 1) # => [1, 2]
-        # 
-        def where options = {}
-          result = Client.read self.resource, nil, options
+        #
+        def where client, options = {}
+          result = client.read self.resource, nil, options
           handle_result result, options
         end
 
@@ -57,8 +57,8 @@ module Prestashop
         #
         #   Car.destroy(1) # => true
         #
-        def destroy id
-          Client.delete self.resource, id
+        def destroy client, id
+          client.delete self.resource, id
         end
 
         # Create hash suitable for update, contains #fixed_hash as hash with deleted
@@ -66,8 +66,8 @@ module Prestashop
         #
         #   Car.update_hash(1, name: 'BMW7') # => {name: 'BMW7', manufacturer: 'BMW'}
         #
-        def update_hash id, options = {}
-          original = defined?(fixed_hash(nil)) ? fixed_hash(id) : find(id)
+        def update_hash client, id, options = {}
+          original = defined?(fixed_hash(nil)) ? fixed_hash(id) : find(client, id)
           original.merge(options)
         end
 
@@ -75,22 +75,22 @@ module Prestashop
         #
         #   Car.update_payload(1, name: 'BMW 7') # => <prestashop xmlns:xlink="http://www.w3.org/1999/xlink"><car><name><![CDATA[BMW 7]]></name></car></prestashop>
         #
-        def update_payload id, options = {}
-          Api::Converter.build(self.resource, self.model, update_hash(id, options))
+        def update_payload client, id, options = {}
+          Api::Converter.build(self.resource, self.model, update_hash(client, id, options))
         end
 
         # Update model, with class resource by +id+ and given updates
         #
         #   Car.update(1, name: 'BMW 7') # => {id: 1, name: 'BMW 7'}
         #
-        def update id, options = {}
-          result = Client.update self.resource, id, update_payload(id, options)
+        def update client, id, options = {}
+          result = client.update self.resource, id, update_payload(client, id, options)
           result ? result[self.model] : nil
-        end 
+        end
 
         private
           # Handle result to return +id+ or array with +ids+ of requested objects
-          # 
+          #
           #   handle_result({ customers: { customer: [ 1,2 ] } }) # => [1, 2]
           #   handle_result({ customers: { customer: { attr: { id: 1 }} } }) # => [1]
           #
@@ -106,11 +106,11 @@ module Prestashop
                 objects.kind_of?(Array) ? objects.map{ |o| o[:attr][:id] } : [ objects[:attr][:id] ]
               else
                 nil
-              end    
+              end
             end
           end
       end
-      
+
       module InstanceMethods
 
         # Generate hash with ID
@@ -124,7 +124,7 @@ module Prestashop
         # Make array of unique IDs in hash
         #
         #   car.hash_ids(1,2,3) # => [{id: 1},{id: 2},{id: 3}]
-        # 
+        #
         def hash_ids ids
           ids.flatten.uniq.map{|id| hash_id(id)} if ids
         end
@@ -139,15 +139,15 @@ module Prestashop
 
         # Create new model from instance, based on class resource a payload generated from
         # hash method
-        # 
+        #
         #   Car.new(name: 'BMW 7', manufacturer: 'BMW').create # => { id: 1, name: 'BMW 7', manufacturer: 'BMW' }
-        # 
-        def create
-          result = Client.create self.class.resource, payload
+        #
+        def create(client)
+          result = client.create self.class.resource, payload
           result ? result[self.class.model] : nil
         end
       end
-      
+
       def self.included(receiver)
         receiver.extend         ClassMethods
         receiver.send :include, InstanceMethods

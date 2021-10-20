@@ -4,7 +4,7 @@ module Prestashop
     class Combination < Model
       resource :combinations
       model :combination
-    
+
       attr_accessor :id_lang, :id_product_options, :id_images
       attr_accessor :id, :id_product, :location, :ean13, :upc, :quantity, :reference, :supplier_reference, :wholesale_price,
                     :price, :ecotax, :weight, :unit_price_impact, :minimal_quantity, :default_on, :available_date
@@ -34,10 +34,14 @@ module Prestashop
       end
 
       # ID of combination, or find ID by +reference+ and +id_product+
-      def id
-        @id ||= self.class.find_by 'filter[reference]' => reference, 'filter[id_product]' => id_product
+      # def id
+      #   @id ||= self.class.find_by 'filter[reference]' => reference, 'filter[id_product]' => id_product
+      # end
+      # alias :find? :id
+
+      def find?(client)
+        @id ||= self.class.find_by client, 'filter[reference]' => reference, 'filter[id_product]' => id_product
       end
-      alias :find? :id
 
       def hash
         combination = {
@@ -62,15 +66,15 @@ module Prestashop
         combination
       end
 
-      def update options = {}
-        self.class.update(id, options)
+      def update client, options = {}
+        self.class.update(client, id, options)
       end
 
       class << self
-        def deactivate supplier
+        def deactivate client, supplier
           first = (Date.today-365).strftime("%F")
           last = (Date.today-1).strftime("%F")
-          combinations = where 'filter[date_upd]' => "[#{first},#{last}]", date: 1, 'filter[supplier_reference]' => supplier, limit: 1000
+          combinations = where client, 'filter[date_upd]' => "[#{first},#{last}]", date: 1, 'filter[supplier_reference]' => supplier, limit: 1000
           if combinations and !combinations.empty?
             combinations.map{|c| delete(c)}
           end

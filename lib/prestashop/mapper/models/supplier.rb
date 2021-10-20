@@ -30,8 +30,8 @@ module Prestashop
       end
 
       # Find or create supplier from hash
-      def find_or_create
-        supplier = self.class.find_by 'filter[name]' => name
+      def find_or_create(client)
+        supplier = self.class.find_by client, 'filter[name]' => name
         supplier ? supplier : create[:id]
       end
 

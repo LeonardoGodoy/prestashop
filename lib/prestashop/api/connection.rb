@@ -100,7 +100,7 @@ module Prestashop
       #   * limit
       #   * schema
       #   * date
-      #   * price (product and combination resource only. see http://doc.prestashop.com/display/PS16/Chapter+10+-+Price+management) 
+      #   * price (product and combination resource only. see http://doc.prestashop.com/display/PS16/Chapter+10+-+Price+management)
       #
       def get resource, id = nil, opts = {}
         id.to_i unless id.kind_of?(Array)

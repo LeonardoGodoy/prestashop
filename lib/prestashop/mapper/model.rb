@@ -33,6 +33,6 @@ module Prestashop
           value.nil? ? @model : @model = value
         end
       end
-    end    
+    end
   end
 end

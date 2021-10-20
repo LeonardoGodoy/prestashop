@@ -50,7 +50,7 @@ module Prestashop
       #
       def self.build_nodes ml, source, mkey = nil
         unless source[:attr] and source[:val]
-          source.each do |key, value| 
+          source.each do |key, value|
             if value.kind_of? Hash
               if value[:attr]
                 ml.send(key, value[:attr]){
@@ -93,7 +93,7 @@ module Prestashop
       #   Converter.xml_node_to_hash '<customer id_lang="1">Steve</customer>'
       #   # => { attr: { id_lang: 1 }, val: 'Steve'  }
       #
-      def self.xml_node_to_hash node 
+      def self.xml_node_to_hash node
         # If we are at the root of the document, start the hash
         if node.element?
           result_hash = {}
@@ -130,18 +130,18 @@ module Prestashop
                 else
                   result_hash[child.name.to_sym] = [result_hash[child.name.to_sym]] << prepare(result)
                 end
-              else 
+              else
                 result_hash[child.name.to_sym] = prepare(result)
               end
             end
-   
+
             return result_hash
           else
             return result_hash
-          end 
-        else 
-          return prepare(node.content.to_s) 
-        end 
+          end
+        else
+          return prepare(node.content.to_s)
+        end
       end
 
       def self.prepare data

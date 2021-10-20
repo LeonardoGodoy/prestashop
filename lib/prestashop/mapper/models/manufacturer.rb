@@ -45,15 +45,15 @@ module Prestashop
           short_description:  hash_lang(short_description, id_lang),
           meta_title:         hash_lang(name, id_lang),
           meta_description:   hash_lang(short_description, id_lang),
-          meta_keywords:      hash_lang(meta_keywords, id_lang) }      
+          meta_keywords:      hash_lang(meta_keywords, id_lang) }
       end
 
-      def find_or_create
+      def find_or_create(client)
         if name and !name.empty?
-          manufacturer = self.class.find_in_cache name
+          manufacturer = self.class.find_in_cache client, name
           unless manufacturer
             manufacturer = create
-            Client.clear_manufacturers_cache
+            client.clear_manufacturers_cache
           end
           manufacturer[:id]
         end
@@ -66,8 +66,8 @@ module Prestashop
       end
 
       class << self
-        def find_in_cache name
-          Client.manufacturers_cache.find{|m| m[:name] == name } if Client.manufacturers_cache
+        def find_in_cache client, name
+          client.manufacturers_cache.find{|m| m[:name] == name } if client.manufacturers_cache
         end
 
         def cache

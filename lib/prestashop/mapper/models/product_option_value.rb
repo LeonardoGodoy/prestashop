@@ -25,11 +25,11 @@ module Prestashop
           color:              color }
       end
 
-      def find_or_create
-        result = self.class.find_in_cache id_attribute_group, name, id_lang
+      def find_or_create client
+        result = self.class.find_in_cache client, id_attribute_group, name, id_lang
         unless result
-          result = create
-          Client.clear_option_values_cache
+          result = create(client)
+          client.clear_option_values_cache
         end
         result[:id]
       end
@@ -43,12 +43,12 @@ module Prestashop
       end
 
       class << self
-        def find_in_cache id_attribute_group, name, id_lang
-          Client.option_values_cache.find{|v| v[:id_attribute_group] == id_attribute_group and v[:name].find_lang(name, id_lang)} if Client.option_values_cache
+        def find_in_cache client, id_attribute_group, name, id_lang
+          client.option_values_cache.find{|v| v[:id_attribute_group] == id_attribute_group and v[:name].find_lang(name, id_lang)} if client.option_values_cache
         end
 
-        def cache
-          all display: '[id,id_attribute_group,name]'
+        def cache(client)
+          all client, display: '[id,id_attribute_group,name]'
         end
       end
     end

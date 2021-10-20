@@ -29,12 +29,12 @@ module Prestashop
           custom:     custom,
           value:      hash_lang(value, id_lang) }
       end
-      
-      def find_or_create
-        result = self.class.find_in_cache id_feature, value, id_lang
+
+      def find_or_create(client)
+        result = self.class.find_in_cache client, id_feature, value, id_lang
         unless result
-          result = create
-          Client.clear_feature_values_cache
+          result = create(client)
+          client.clear_feature_values_cache
         end
         result[:id]
       end
@@ -47,12 +47,12 @@ module Prestashop
       end
 
       class << self
-        def find_in_cache id_feature, value, id_lang
-          Client.feature_values_cache.find{|v| v[:id_feature] == id_feature and v[:value].find_lang(value, id_lang)} if Client.feature_values_cache
+        def find_in_cache client, id_feature, value, id_lang
+          client.feature_values_cache.find{|v| v[:id_feature] == id_feature and v[:value].find_lang(value, id_lang)} if client.feature_values_cache
         end
 
-        def cache
-          all display: '[id,id_feature,value]'
+        def cache(client)
+          all client, display: '[id,id_feature,value]'
         end
       end
     end

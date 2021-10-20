@@ -34,11 +34,11 @@ module Prestashop
           public_name: hash_lang(public_name, id_lang) }
       end
 
-      def find_or_create
-        option = self.class.find_in_cache name, id_lang
+      def find_or_create client
+        option = self.class.find_in_cache client, name, id_lang
         unless option
-          option = create
-          Client.clear_options_cache
+          option = create(client)
+          client.clear_options_cache
         end
         option[:id]
       end
@@ -50,17 +50,17 @@ module Prestashop
       end
 
       class << self
-        def create_from_hash product_options, id_lang
+        def create_from_hash client, product_options, id_lang
           result = []
           product_options.each do |product_option|
-            id_o = ProductOption.new(name: product_option[:name], id_lang: id_lang).find_or_create
-            result << ProductOptionValue.new(name: product_option[:value], id_attribute_group: id_o, id_lang: id_lang).find_or_create
+            id_o = ProductOption.new(name: product_option[:name], id_lang: id_lang).find_or_create(client)
+            result << ProductOptionValue.new(name: product_option[:value], id_attribute_group: id_o, id_lang: id_lang).find_or_create(client)
           end if product_options
           result
         end
 
-        def find_in_cache name, id_lang
-          Client.options_cache.find{|k| k[:name].find_lang(name, id_lang) } if Client.options_cache
+        def find_in_cache client, name, id_lang
+          client.options_cache.find{|k| k[:name].find_lang(name, id_lang) } if client.options_cache
         end
 
         def cache

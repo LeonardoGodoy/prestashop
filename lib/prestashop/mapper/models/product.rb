@@ -149,14 +149,19 @@ module Prestashop
       end
 
       # Find product by +reference+ and +id_supplier+, returns +id+
-      def id
-        @id ||= self.class.find_by 'filter[reference]' => reference, 'filter[id_supplier]' => id_supplier
+      # def id
+      #   @id ||= self.class.find_by 'filter[reference]' => reference, 'filter[id_supplier]' => id_supplier
+      # end
+      # alias :find? :id
+
+      # Find product by +reference+ and +id_supplier+, returns +id+
+      def find?(client)
+        @id ||= self.class.find_by client, 'filter[reference]' => reference, 'filter[id_supplier]' => id_supplier
       end
-      alias :find? :id
 
       # Update product with given options
-      def update options = {}
-        self.class.update(id, options)
+      def update client, options = {}
+        self.class.update(client, id, options)
       end
 
       # Generate hash of single feature
@@ -174,8 +179,8 @@ module Prestashop
       end
 
       class << self
-        def fixed_hash id
-          product = find id
+        def fixed_hash client, id
+          product = find(client, id)
           product.delete(:position_in_category)
           product.delete(:manufacturer_name)
           product.delete(:quantity)
@@ -185,10 +190,10 @@ module Prestashop
           product
         end
 
-        def deactivate id_supplier
+        def deactivate client, id_supplier
           first = (Date.today-365).strftime("%F")
           last = (Date.today-1).strftime("%F")
-          products = where 'filter[date_upd]' => "[#{first},#{last}]", date: 1, 'filter[id_supplier]' => id_supplier, 'filter[active]' => 1, limit: 1000
+          products = where client, 'filter[date_upd]' => "[#{first},#{last}]", date: 1, 'filter[id_supplier]' => id_supplier, 'filter[active]' => 1, limit: 1000
           if products and !products.empty?
             products.map{|p| update(p, active: 0)}
           end

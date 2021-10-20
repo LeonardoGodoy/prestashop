@@ -6,8 +6,8 @@ module Prestashop
       model :language
 
       class << self
-        def find_by_iso_code iso_code
-          find_by 'filter[iso_code]' => iso_code
+        def find_by_iso_code client, iso_code
+          client.find_by 'filter[iso_code]' => iso_code
         end
       end
     end

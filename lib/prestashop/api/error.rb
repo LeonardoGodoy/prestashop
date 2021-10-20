@@ -1,8 +1,8 @@
 module Prestashop
   module Api
     class InvalidCredentials < RuntimeError
-      def initialize 
-        super "Your credentials are invalid" 
+      def initialize
+        super "Your credentials are invalid"
       end
     end
 

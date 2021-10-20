@@ -60,11 +60,11 @@ module Prestashop
       end
 
       # Find category by name and id parent, create new one from hash, when doesn't exist
-      def find_or_create
-        category = self.class.find_in_cache id_parent, name, id_lang
+      def find_or_create(client)
+        category = self.class.find_in_cache client, id_parent, name, id_lang
         unless category
-          category = create
-          Client.clear_categories_cache
+          category = create(client)
+          client.clear_categories_cache
         end
         category[:id]
       end
@@ -74,13 +74,13 @@ module Prestashop
         # Search for category based on args on cached categories, see #cache and #Client::Settings.categories_cache
         # Returns founded category or nil
         #
-        def find_in_cache id_parent, name, id_lang
-          Client.categories_cache.find{ |c| c[:id_parent] == id_parent and c[:name].find_lang(name, id_lang) }
+        def find_in_cache client, id_parent, name, id_lang
+          client.categories_cache.find{ |c| c[:id_parent] == id_parent and c[:name].find_lang(name, id_lang) }
         end
 
         # Requesting all on Prestashop API, displaying id, id_parent, name
-        def cache
-          all display: '[id, id_parent, name]'
+        def cache(client)
+          all client, display: '[id, id_parent, name]'
         end
 
         # Create new category based on given param, delimited by delimiter in settings
@@ -88,23 +88,23 @@ module Prestashop
         # ==== Example:
         #   Category.create_from_name('Apple||iPhone', 2) # => [1, 2]
         #
-        def create_from_name category_name, id_lang
+        def create_from_name client, category_name, id_lang
           if category_name and !category_name.empty?
             names = [category_name.split('||')].flatten!
             categories = []
             id_parent = 2
             names.each do |name|
-              id_parent = new(name: name, id_parent: id_parent, id_lang: id_lang).find_or_create
+              id_parent = new(name: name, id_parent: id_parent, id_lang: id_lang).find_or_create(client)
               categories << id_parent
             end
             categories
           end
         end
 
-        def create_from_names category_names, id_lang
+        def create_from_names client, category_names, id_lang
           categories = []
           category_names.each do |category_name|
-            categories << create_from_name(category_name, id_lang)
+            categories << create_from_name(client, category_name, id_lang)
           end
           categories.flatten.uniq
         end

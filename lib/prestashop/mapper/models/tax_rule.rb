@@ -6,8 +6,8 @@ module Prestashop
       model :tax_rule
 
       class << self
-        def get_by_id_country id 
-          where 'filter[id_country]' => id, display: 'full'
+        def get_by_id_country client, id
+          where client, 'filter[id_country]' => id, display: 'full'
         end
       end
     end
