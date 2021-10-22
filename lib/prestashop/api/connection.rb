@@ -35,14 +35,14 @@ module Prestashop
       # which can be usedo for API call
       #
       def connection
-        Faraday.new do |builder|
-          builder.url_prefix = api_url
-          builder.request     :multipart
-          builder.request     :url_encoded
-          builder.request     :retry, 5
-          builder.response    :logger if ENV['DEBUG']
-          builder.adapter     :net_http
-          builder.basic_auth  api_key, ''
+        Faraday.new do |conn|
+          conn.url_prefix = api_url
+          conn.request  :multipart
+          conn.request  :url_encoded
+          conn.request  :retry, 5
+          conn.response :logger if ENV['DEBUG']
+          conn.adapter  :net_http
+          conn.request  :basic_auth, api_key, ''
         end
       end
 
