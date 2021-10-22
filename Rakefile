@@ -10,5 +10,5 @@ task default: :test
 
 desc "Open an irb session preloaded with this library"
 task :console do
-  sh "irb -rubygems -I lib -r prestashop.rb"
+  sh "irb -I lib -r prestashop.rb"
 end

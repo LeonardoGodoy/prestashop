@@ -7,6 +7,10 @@ module Prestashop
           client.read self.resource, nil, { schema: schema_type }
         end
 
+        def required_fields client
+          attributes = schema client, true
+          attributes[self.model].select {|k, v| v && v.dig(:attr, :required) }
+        end
         # Determinate if model with class resource exists with given id
         #
         #   Car.exists?(1) # => true # if given car exist
