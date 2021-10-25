@@ -37,8 +37,8 @@ module Prestashop
         #   Car.find_by(name: 'BMW') # => 1
         #
         def find_by client, options = {}
-          results = where(options)
-          results ? results.first : nil
+          options.merge(limit: 1)
+          where(client, options).first
         end
 
         # Get models all results by class resource, you can specifi what
@@ -101,20 +101,21 @@ module Prestashop
           #
           #   handle_result({ customers: { customer: [ 1,2 ] } }) # => [1, 2]
           #   handle_result({ customers: { customer: { attr: { id: 1 }} } }) # => [1]
+          #   handle_result({ customers: { customer: { attr: { id: '_not_found' }} } }) # => []
           #
           def handle_result result, options = {}
+            return [] unless result[self.resource].kind_of?(Hash)
+
+            objects = result[self.resource][self.model]
+
+            return [] unless objects
+
+            array_format = objects.kind_of?(Array)
+
             if options[:display]
-              if result[self.resource].kind_of?(Hash) and result[self.resource][self.model]
-                objects = result[self.resource][self.model]
-                objects.kind_of?(Array) ? objects : [objects]
-              end
+              array_format ? objects : [objects]
             else
-              if result[self.resource].kind_of?(Hash) and result[self.resource][self.model]
-                [objects = result[self.resource][self.model]]
-                objects.kind_of?(Array) ? objects.map{ |o| o[:attr][:id] } : [ objects[:attr][:id] ]
-              else
-                nil
-              end
+              array_format ? objects.map{ |o| o[:attr][:id] } : [ objects[:attr][:id] ]
             end
           end
       end
