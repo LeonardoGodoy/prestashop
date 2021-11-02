@@ -107,12 +107,11 @@ module Prestashop
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
         raise ArgumentError, "id: #{id} must be integer, array or nil" unless id.kind_of?(Integer) or id.kind_of?(Array) or id == nil
 
-        white_list = %w(filter display sort limit schema date price)
-        params = {}
-        opts.each do |name, value|
-          if white_list.include? name.to_s.split('[').first
-            params[name.to_sym] = value
-          end
+        white_list = %i(filter display sort limit schema date price)
+        params = opts.slice(*white_list)
+
+        if params[:display].kind_of?(Array)
+          params[:display] = "[#{params[:display].join(',')}]"
         end
 
         request_path = path(resource, id)
