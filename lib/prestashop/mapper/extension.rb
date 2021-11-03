@@ -97,6 +97,11 @@ module Prestashop
           result ? result[self.model] : nil
         end
 
+        def create(client, hash)
+          result = client.create self.resource, self.new(hash).payload
+          result ? result[self.model] : nil
+        end
+
         private
           # Handle result to return +id+ or array with +ids+ of requested objects
           #
