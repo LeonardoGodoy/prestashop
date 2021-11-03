@@ -16,7 +16,7 @@ module Prestashop
         @api_key = api_key
         self.api_url = api_url
 
-        raise InvalidCredentials unless self.test
+        # raise InvalidCredentials unless self.test
       end
 
       # Convert url to  suitable for Prestashop API
