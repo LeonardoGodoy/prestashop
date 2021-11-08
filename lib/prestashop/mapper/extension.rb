@@ -2,6 +2,16 @@ module Prestashop
   module Mapper
     module Extension
       module ClassMethods
+        def finders(*attr)
+          klass = self.singleton_class
+
+          attr.each do |attr_name|
+            singleton_class.send :define_method, "find_by_#{attr_name}" do |client, value, options={}|
+              find_by(client, { attr_name => value }, options)
+            end
+          end
+        end
+
         def schema client, include_synopsis=false
           schema_type = include_synopsis ? 'synopsis' : 'blank'
           client.read self.resource, nil, { schema: schema_type }
@@ -36,9 +46,11 @@ module Prestashop
         # Returns first result, see #where for more informations
         #
         #   Car.find_by(name: 'BMW') # => 1
+        #   Car.find_by(name: 'BMW', display: :full) # => { id: 1, ... }
         #
-        def find_by client, options = {}
-          options.merge(limit: 1)
+        def find_by client, filter={}, options = {}
+          options.merge!(limit: 1)
+          options.merge!(filter: filter)
           where(client, options).first
         end
 
@@ -121,7 +133,7 @@ module Prestashop
             if options[:display]
               array_format ? objects : [objects]
             else
-              array_format ? objects.map{ |o| o[:attr][:id] } : [ objects[:attr][:id] ]
+              array_format ? objects.map { |o| o[:attr][:id] } : [ objects[:attr][:id] ]
             end
           end
       end
