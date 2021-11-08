@@ -5,6 +5,8 @@ module Prestashop
       resource :product_options
       model :product_option
 
+      finders :name
+
       attr_accessor :id, :is_color_group, :group_type, :position, :name
       attr_writer   :public_name
       attr_accessor :id_lang
@@ -34,38 +36,10 @@ module Prestashop
           public_name: hash_lang(public_name, id_lang) }
       end
 
-      def find_or_create client
-        option = self.class.find_in_cache client, name, id_lang
-        unless option
-          option = create(client)
-          client.clear_options_cache
-        end
-        option[:id]
-      end
-
       def validate!
         raise ArgumentError, 'id lang must be number' unless id_lang.kind_of?(Integer)
         raise ArgumentError, 'name must string' unless name.kind_of?(String)
         raise ArgumentError, 'group_type must string' unless group_type.kind_of?(String)
-      end
-
-      class << self
-        def create_from_hash client, product_options, id_lang
-          result = []
-          product_options.each do |product_option|
-            id_o = ProductOption.new(name: product_option[:name], id_lang: id_lang).find_or_create(client)
-            result << ProductOptionValue.new(name: product_option[:value], id_attribute_group: id_o, id_lang: id_lang).find_or_create(client)
-          end if product_options
-          result
-        end
-
-        def find_in_cache client, name, id_lang
-          client.options_cache.find{|k| k[:name].find_lang(name, id_lang) } if client.options_cache
-        end
-
-        def cache
-          all display: '[id,name]'
-        end
       end
     end
   end

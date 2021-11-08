@@ -17,18 +17,6 @@ module Prestashop
         @depends_on_stock     = args.fetch(:depends_on_stock, 0)
         @out_of_stock         = args.fetch(:out_of_stock, 2)
       end
-
-      def find?(client)
-        @id ||= if id_product_attribute == 0
-          self.class.find_by client, 'filter[id_product]' => id_product
-        else
-          self.class.find_by client, 'filter[id_product]' => id_product, 'filter[id_product_attribute]' => id_product_attribute
-        end
-      end
-
-      def update client, options = {}
-        self.class.update(client, id, options) if find?
-      end
     end
   end
 end

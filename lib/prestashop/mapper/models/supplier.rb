@@ -5,6 +5,8 @@ module Prestashop
       resource :suppliers
       model :supplier
 
+      finders :name
+
       attr_accessor :id, :link_rewrite, :name, :active, :description, :meta_title, :meta_description, :meta_keywords
       attr_accessor :id_lang
 

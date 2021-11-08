@@ -25,31 +25,12 @@ module Prestashop
           color:              color }
       end
 
-      def find_or_create client
-        result = self.class.find_in_cache client, id_attribute_group, name, id_lang
-        unless result
-          result = create(client)
-          client.clear_option_values_cache
-        end
-        result[:id]
-      end
-
       # Supplier must have 1/0 as active and name must be string
       def validate!
         raise ArgumentError, 'id lang must be number' unless id_lang.kind_of?(Integer)
         raise ArgumentError, 'name must string' unless name.kind_of?(String)
         raise ArgumentError, 'id attribute group must be number' unless id_attribute_group.kind_of?(Integer)
         raise ArgumentError, 'color must be true or false' unless color == 1 or color == 0
-      end
-
-      class << self
-        def find_in_cache client, id_attribute_group, name, id_lang
-          client.option_values_cache.find{|v| v[:id_attribute_group] == id_attribute_group and v[:name].find_lang(name, id_lang)} if client.option_values_cache
-        end
-
-        def cache(client)
-          all client, display: '[id,id_attribute_group,name]'
-        end
       end
     end
   end

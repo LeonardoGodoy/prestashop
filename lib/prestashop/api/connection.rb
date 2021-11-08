@@ -8,15 +8,13 @@ module Prestashop
     class Connection
       attr_reader :api_key, :api_url
 
-      # Create new connection. Raise error, when is not possible validate connection from any reason
+      # Create new connection
       #
       #   Prestashop::Api::Connection.new 'TOKEN342', 'mystore.com'
       #
       def initialize api_key, api_url
         @api_key = api_key
         self.api_url = api_url
-
-        # raise InvalidCredentials unless self.test
       end
 
       # Convert url to  suitable for Prestashop API

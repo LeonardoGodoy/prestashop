@@ -30,30 +30,11 @@ module Prestashop
           value:      hash_lang(value, id_lang) }
       end
 
-      def find_or_create(client)
-        result = self.class.find_in_cache client, id_feature, value, id_lang
-        unless result
-          result = create(client)
-          client.clear_feature_values_cache
-        end
-        result[:id]
-      end
-
       def validate!
         raise ArgumentError, 'id lang must be number' unless id_lang.kind_of?(Integer)
         raise ArgumentError, 'id feature must string' unless id_feature.kind_of?(Integer)
         raise ArgumentError, 'custom must be 0 or 1' unless custom == 0 or custom == 1
         raise ArgumentError, 'value must string' unless value.kind_of?(String)
-      end
-
-      class << self
-        def find_in_cache client, id_feature, value, id_lang
-          client.feature_values_cache.find{|v| v[:id_feature] == id_feature and v[:value].find_lang(value, id_lang)} if client.feature_values_cache
-        end
-
-        def cache(client)
-          all client, display: '[id,id_feature,value]'
-        end
       end
     end
   end

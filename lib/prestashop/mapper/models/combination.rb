@@ -69,17 +69,6 @@ module Prestashop
       def update client, options = {}
         self.class.update(client, id, options)
       end
-
-      class << self
-        def deactivate client, supplier
-          first = (Date.today-365).strftime("%F")
-          last = (Date.today-1).strftime("%F")
-          combinations = where client, 'filter[date_upd]' => "[#{first},#{last}]", date: 1, 'filter[supplier_reference]' => supplier, limit: 1000
-          if combinations and !combinations.empty?
-            combinations.map{|c| delete(c)}
-          end
-        end
-      end
     end
   end
 end

@@ -190,15 +190,6 @@ module Prestashop
           product.delete(:id_default_image)
           product
         end
-
-        def deactivate client, id_supplier
-          first = (Date.today-365).strftime("%F")
-          last = (Date.today-1).strftime("%F")
-          products = where client, 'filter[date_upd]' => "[#{first},#{last}]", date: 1, 'filter[id_supplier]' => id_supplier, 'filter[active]' => 1, limit: 1000
-          if products and !products.empty?
-            products.map{|p| update(p, active: 0)}
-          end
-        end
       end
     end
   end
