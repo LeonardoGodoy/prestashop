@@ -14,15 +14,16 @@ module Prestashop
         @color              = args.fetch(:color, 0)
         @position           = args[:position]
         @name               = args.fetch(:name)
-
         @id_lang            = args.fetch(:id_lang)
       end
 
       def hash
         validate!
-        { name:               hash_lang(name, id_lang),
+        {
+          name:               hash_lang(name, id_lang),
           id_attribute_group: id_attribute_group,
-          color:              color }
+          color:              color
+        }
       end
 
       # Supplier must have 1/0 as active and name must be string
@@ -30,7 +31,6 @@ module Prestashop
         raise ArgumentError, 'id lang must be number' unless id_lang.kind_of?(Integer)
         raise ArgumentError, 'name must string' unless name.kind_of?(String)
         raise ArgumentError, 'id attribute group must be number' unless id_attribute_group.kind_of?(Integer)
-        raise ArgumentError, 'color must be true or false' unless color == 1 or color == 0
       end
     end
   end
