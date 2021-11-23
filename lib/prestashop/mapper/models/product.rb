@@ -181,19 +181,6 @@ module Prestashop
       def id_categories_all
         [id_category_default, id_categories].flatten.uniq
       end
-
-      class << self
-        def fixed_hash client, id
-          product = find(client, id)
-          product.delete(:position_in_category)
-          product.delete(:manufacturer_name)
-          product.delete(:quantity)
-          product.delete(:type)
-          product.delete(:associations)
-          product.delete(:id_default_image)
-          product
-        end
-      end
     end
   end
 end

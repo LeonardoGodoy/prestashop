@@ -1,7 +1,8 @@
 using Prestashop::Mapper::Refinement
+
 module Prestashop
-  module Mapper
-    class Address < Model
+  module Resources
+    class Address < Mapper::Resource
       resource :addresses
       model :address
     end

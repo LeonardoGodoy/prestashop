@@ -87,30 +87,32 @@ module Prestashop
         #
         #   Car.update_hash(1, name: 'BMW7') # => {name: 'BMW7', manufacturer: 'BMW'}
         #
-        def update_hash client, id, options = {}
-          original = defined?(fixed_hash(nil)) ? fixed_hash(id) : find(client, id)
-          original.merge(options)
+        def update_hash client, id, attributes = {}
+          current_attributes = find(client, id).except(:associations, *self.not_writable_attributes)
+          current_attributes.merge(self.new(attributes).hash)
         end
 
         # Create payload for update, converts hash to XML
         #
         #   Car.update_payload(1, name: 'BMW 7') # => <prestashop xmlns:xlink="http://www.w3.org/1999/xlink"><car><name><![CDATA[BMW 7]]></name></car></prestashop>
         #
-        def update_payload client, id, options = {}
-          Api::Converter.build(self.resource, self.model, update_hash(client, id, options))
+        def update_payload(client, id, attributes = {})
+          Api::Converter.build(self.resource, self.model, update_hash(client, id, attributes))
         end
 
         # Update model, with class resource by +id+ and given updates
         #
         #   Car.update(1, name: 'BMW 7') # => {id: 1, name: 'BMW 7'}
         #
-        def update client, id, options = {}
-          result = client.update self.resource, id, update_payload(client, id, options)
+        def update(client, id, attributes = {})
+          payload = update_payload(client, id, attributes)
+
+          result = client.update(self.resource, id, payload)
           result ? result[self.model] : nil
         end
 
         def create(client, hash)
-          result = client.create self.resource, self.new(hash).payload
+          result = client.create(self.resource, self.new(hash).payload)
           result ? result[self.model] : nil
         end
 
@@ -162,16 +164,6 @@ module Prestashop
         #
         def payload
           Api::Converter.build(self.class.resource, self.class.model, hash)
-        end
-
-        # Create new model from instance, based on class resource a payload generated from
-        # hash method
-        #
-        #   Car.new(name: 'BMW 7', manufacturer: 'BMW').create # => { id: 1, name: 'BMW 7', manufacturer: 'BMW' }
-        #
-        def create(client)
-          result = client.create self.class.resource, payload
-          result ? result[self.class.model] : nil
         end
       end
 

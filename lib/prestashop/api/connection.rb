@@ -103,7 +103,6 @@ module Prestashop
       def get resource, id = nil, opts = {}
         id.to_i unless id.kind_of?(Array)
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
-        raise ArgumentError, "id: #{id} must be integer, array or nil" unless id.kind_of?(Integer) or id.kind_of?(Array) or id == nil
 
         white_list = %i(filter display sort limit schema date price)
         params = opts.slice(*white_list)
