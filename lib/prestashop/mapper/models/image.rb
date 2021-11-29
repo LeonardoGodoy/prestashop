@@ -47,6 +47,10 @@ module Prestashop
       def payload
         { image: Faraday::UploadIO.new(file.path, 'image') }
       end
+
+      def self.destroy(client, resource:, id_resource:, id:)
+        client.delete("images/#{resource}/#{id_resource}", id)
+      end
     end
   end
 end
