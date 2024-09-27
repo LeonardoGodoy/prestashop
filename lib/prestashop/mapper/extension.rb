@@ -88,7 +88,7 @@ module Prestashop
         #   Car.update_hash(1, name: 'BMW7') # => {name: 'BMW7', manufacturer: 'BMW'}
         #
         def update_hash client, id, options = {}
-          original = defined?(fixed_hash(nil)) ? fixed_hash(id) : find(client, id)
+          original = defined?(fixed_hash) ? fixed_hash(client, id) : find(client, id)
           original.merge(options)
         end
 
